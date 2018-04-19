@@ -1,6 +1,9 @@
 # Capture the Flag
 
 
+![Capture the Flag sample image](CTFimg.png)
+
+
 Capture the Flag is a prototype I've been working on in 2018. I'm using it to practice modeling and to test AI behavior. I've made all of the Assets so far and have written all of the code myself. I've been trying to balance making it a complete game with testing new features.
 
 
