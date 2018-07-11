@@ -449,25 +449,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {x: 0, y: 0, z: 0}
+  team: 0
   health: 3
   knockback: 100
-  Jump: 25
+  Jump: 30
   Damp: 1
-  Speed: 18
+  Speed: 25
   Gravity: 1.2
   RotateSpeed: 9
   body: {fileID: 1662454490096122}
   rot: {x: 0, y: 0, z: 0, w: 0}
   move: {x: 0, y: 0, z: 0}
+  sim: {fileID: 0}
   flag: {fileID: 0}
   weap: {fileID: 114024827229097958}
-  team: 0
   dead: 0
   respawnTimer: 0
-  goalCheck: 0
-  playType: 1
-  up: 1
+  goalCheck: {x: 0, y: 0, z: 0}
+  playType: 0
+  respawnDelay: 5
   wallDist: 6
+  sightRadius: 50
+  sightAngle: 45
+  meshBody: {fileID: 23391140755206768}
 --- !u!136 &136085150390081934
 CapsuleCollider:
   m_ObjectHideFlags: 1

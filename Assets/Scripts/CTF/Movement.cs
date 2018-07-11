@@ -30,6 +30,9 @@ public abstract class Movement : Stats {
     // The timer determining how long to move using velocity
     protected float vel = 0f;
 
+    protected float delay = 0f;
+    protected bool canJump = true;
+
     // Initialize the movement components
 	public void SetupMov () {
         velocity = new Vector3();
@@ -38,7 +41,7 @@ public abstract class Movement : Stats {
         {
             rot = body.transform.rotation;
         }
-        vel = CTFScript.delay;
+        vel = delay;
 	}
     
     // Hurt this object and move it in the given knockback direction
@@ -76,10 +79,25 @@ public abstract class Movement : Stats {
         if (!cont.isGrounded)
         {
             velocity.y -= Gravity;
+            canJump = false;
+        }
+        else if (velocity.y < 0f)
+        {
+            canJump = true;
+            velocity.y = 0f;
         }
 
         // Move the object
         cont.Move(velocity * Time.deltaTime);
+    }
+
+    protected void JumpTry()
+    {
+        if (canJump)
+        {
+            velocity.y = Jump;
+            canJump = false;
+        }
     }
 
     // Rotate the body in the direction of the current move

@@ -4,6 +4,7 @@ using UnityEngine;
 
 // A contestant in the Capture the Flag Game
 public abstract class CTFPlayer : Movement{
+    public CTFSim sim;
     // The way the player is playing
     public enum OSD
     {
@@ -20,10 +21,13 @@ public abstract class CTFPlayer : Movement{
     public bool dead = false;
     // The timer counting to when the player respawns
     public float respawnTimer = 0f;
+    //
     // Whether the player has visited the enemy goal, used mostly for AI
-    public bool goalCheck = false;
+    public Vector3 goalCheck = new Vector3();
     // The current play type
     public OSD playType = OSD.Support;
+
+    public float respawnDelay = 5f;
 
 
     // Initialize the starting position
@@ -45,7 +49,7 @@ public abstract class CTFPlayer : Movement{
     public void BeDead()
     {
         respawnTimer += Time.deltaTime;
-        if (respawnTimer >= CTFScript.respawnTime)
+        if (respawnTimer >= respawnDelay)
         {
             Reset();
         }

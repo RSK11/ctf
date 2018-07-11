@@ -6,5 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Maps/Menu/Menu.unity
+    guid: ebe60a8f17033b24a9bb353b885bbcfe
+  - enabled: 1
     path: Assets/Maps/Suburbia/Suburb.unity
     guid: df4bfba712b56084f8ee48afcc7ecd30
+  - enabled: 1
+    path: Assets/Maps/TrainingWorld/TrainingWorld.unity
+    guid: c0cf03bd595ff35429ecce0e305c81c9
+  m_configObjects: {}

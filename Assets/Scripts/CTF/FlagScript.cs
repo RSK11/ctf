@@ -5,6 +5,8 @@ using UnityEngine;
 // The flag for capturing in the game
 public class FlagScript : CTFObject {
 
+    public Map map;
+
     // The flag's position relative to the parent
     public Vector3 offset = new Vector3();
     // How far behind the parent to be when carried
@@ -79,7 +81,7 @@ public class FlagScript : CTFObject {
     // The flag has reached a goal, so increment the other team's score and reset the position
     public void Score(int teem)
     {
-        CTFScript.Score(teem);
+        map.sim.Score(teem);
         Reset();
     }
 

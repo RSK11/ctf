@@ -5,19 +5,19 @@ using UnityEngine;
 // A third person camera for following the player
 public class ThrdCam : MonoBehaviour {
     // The offset from the player's position
-    public Vector3 offset = new Vector3();
+    public Vector3 offset = new Vector3(0,1,0);
     // the allowed range for x axis rotation
-    public Vector2 TopRange = new Vector2(5f,90f);
+    public Vector2 TopRange = new Vector2(5f,85f);
     // the x and y axis rotation speeds
-    public Vector2 Speed = new Vector2(5f, 5f);
+    public Vector2 Speed = new Vector2(1.5f, 1.5f);
     // The object to look at
     public GameObject target;
     // The maximum distance for the camera to use
-    public float distance = 7f;
+    public float distance = 20f;
     // The minimum distance for the camera to use
-    public float mindist = 3f;
+    public float mindist = 6f;
     // The camera's current distance
-    private float dist = 3f;
+    private float dist = 6f;
     // The current x axis rotation
     public float angleTop = 60f;
     // The current y axis rotation
