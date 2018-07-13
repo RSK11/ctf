@@ -10,7 +10,13 @@ public class UIListener : MonoBehaviour {
     public Slider time;
     public Toggle player;
 
-	public void StartGame()
+    public void Start()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    public void StartGame()
     {
         CTFSim world = FindObjectOfType<CTFSim>();
         if (world != null)
@@ -24,6 +30,10 @@ public class UIListener : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Space))
         {
             StartGame();
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
         }
     }
 }

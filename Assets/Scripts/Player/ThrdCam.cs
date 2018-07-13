@@ -42,7 +42,7 @@ public class ThrdCam : MonoBehaviour {
         origSide = angleSide;
     }
 	
-	void Update () {
+	void LateUpdate () {
         // Get the mouse movement
         Vector3 delta = new Vector3(Input.GetAxis("Mouse X"),Input.GetAxis("Mouse Y"),0f);
 

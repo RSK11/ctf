@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Linq;
 
 public class Human : AI {
     ThrdCam cam;
     public List<double> ins = new List<double>();
-    private List<List<double>> doubleList = new List<List<double>>();
+    private List<List<double>> inList = new List<List<double>>();
+    private List<List<double>> expList = new List<List<double>>();
+    int count = 5;
+    float timer = 0f;
 
     // Use this for initialization
     public override void Init(int team, Material mat, CTFSim ctf)
@@ -16,7 +20,7 @@ public class Human : AI {
         SetTeam(team);
         sim = ctf;
         meshBody.material = mat;
-        brain = new NeuralNet(8, 5, 4, 4, .7);
+        brain = new NeuralNet(8, 3, 1, 3, .4);
         goalCheck = sim.goals[(team + 1) % 2].transform.position;
     }
 
@@ -31,21 +35,63 @@ public class Human : AI {
         goalCheck = sim.goals[(team + 1) % 2].transform.position;
     }
 
-    public NeuralNet GenSets()
+    public NeuralNet GenSets(int times)
     {
-        List<double> inputs = new List<double>();
-        foreach (List<double> dubs in doubleList)
+        bool remove = false;
+
+        for (int i = 0; i < inList.Count; i++)
         {
-            if (dubs.Count > 5)
+            remove = false;
+            RoundInputVector(i, 0);
+            RoundInputVector(i, 3);
+            RoundInputVector(i, 6);
+            for (int j = 0; j < i; j++)
             {
-                inputs = dubs;
+                if (inList[i].SequenceEqual(inList[j]))
+                {
+                    remove = true;
+                    break;
+                }
             }
-            else
+            if (remove)
             {
-                brain.Train(inputs, dubs);
+                inList.RemoveAt(i);
+                expList.RemoveAt(i);
+                i--;
             }
         }
+        string path = "Assets/test.txt";
+
+        //Write some text to the test.txt file
+        StreamWriter writer = new StreamWriter(path, true);
+        for (int k = 0; k < times; k++)
+        {
+            for (int l = 0; l < inList.Count; l++)
+            {
+                brain.Train(inList[l], expList[l]);
+                if (k == 0)
+                {
+                    foreach (double dub in inList[l])
+                    {
+                        writer.Write(dub + ",");
+                    }
+                    writer.WriteLine("");
+                    foreach (double dubss in expList[l])
+                    {
+                        writer.Write(dubss + ",");
+                    }
+                    writer.WriteLine("");
+                }
+            }
+            }
+        writer.Close();
         return brain;
+    }
+
+    private void RoundInputVector(int i, int j)
+    {
+        inList[i][j] = Mathf.Round((float)inList[i][j] * 100) / 100f;
+        inList[i][j+1] = Mathf.Round((float)inList[i][j+1] * 100f) / 100f;
     }
 
     public void SetCam(ThrdCam camera)
@@ -57,9 +103,7 @@ public class Human : AI {
     {
         FakeLook();
         List<double> dirs = new List<double>();
-        dirs.Add(Input.GetAxis("Horizontal"));
-        dirs.Add(Input.GetAxis("Vertical"));
-        dirs.Add(1);
+        dirs.Add((Vector3.SignedAngle(body.transform.forward,cam.Forward(), Vector3.up) + 180f) / 360f);
         if (Input.GetKeyDown(KeyCode.Space))
         {
             dirs.Add(1);
@@ -77,30 +121,35 @@ public class Human : AI {
             dirs.Add(0);
         }
         directions = dirs;
-        doubleList.Add(ins);
-        doubleList.Add(directions);
+        timer += Time.deltaTime * 2;
+        if (timer > count)
+        {
+            inList.Add(ins);
+            expList.Add(directions);
+            count++;
+        }
     }
 
     public void FakeLook()
     {
-        ins.Clear();
-        double enemyDir = 0;
-        double enemyDist = sightRadius;
+        ins = new List<double>();
+        double enemyAngle = 0;
+        double enemyDist = 1;
         double enemyHasFlag = 0;
         double haveFlag = 0;
+        Vector3 ray = new Vector3();
         Collider[] hits = Physics.OverlapSphere(transform.position, sightRadius);
         foreach (Collider hit in hits)
         {
-            Vector3 ray = hit.transform.position - transform.position;
-            if (Vector3.Angle(cam.Forward(), ray) < sightAngle)
+            ray = hit.transform.position - transform.position;
+            if (Vector3.Angle(body.transform.forward, ray) < sightAngle)
             {
                 if (hit.CompareTag("Contestant"))
                 {
                     CTFPlayer player = hit.gameObject.GetComponent<CTFPlayer>();
-                    if (player.team != team && ((ray.magnitude < enemyDist && enemyHasFlag == 0) || player.flag))
+                    if (player.team != team && ((ray.magnitude / sightRadius < enemyDist && enemyHasFlag == 0) || player.flag))
                     {
-                        enemyDir = Vector3.SignedAngle(cam.Forward(), ray, Vector3.up) / 180f;
-                        enemyDist = ray.magnitude;
+                        AngDist(hit.transform.position, out enemyAngle, out enemyDist);
                         if (player.flag)
                         {
                             enemyHasFlag = 1;
@@ -122,23 +171,15 @@ public class Human : AI {
             haveFlag = 1;
         }
 
-        ins.Add(enemyDir);
+        ins.Add(enemyAngle);
         ins.Add(enemyDist);
         ins.Add(enemyHasFlag);
-        ins.Add(Vector3.SignedAngle(body.transform.forward, goalCheck - transform.position, Vector3.up) / 180f);
-        ins.Add((goalCheck - transform.position).magnitude);
+        AngDist(goalCheck, out enemyAngle, out enemyDist);
+        ins.Add(enemyAngle);
+        ins.Add(enemyDist);
         ins.Add(haveFlag);
-        ins.Add(Vector3.SignedAngle(body.transform.forward, sim.goals[team].transform.position - transform.position, Vector3.up) / 180f);
-        ins.Add((sim.goals[team].transform.position - transform.position).magnitude);
-    }
-
-    public override Vector3 GetDirection()
-    {
-        Vector3 dir = cam.Forward() * (float)directions[1] + cam.Right() * (float)directions[0];
-
-        // Ignore height and small movements
-        dir.y = 0f;
-
-        return dir.normalized;
+        AngDist(sim.goals[team].transform.position, out enemyAngle, out enemyDist);
+        ins.Add(enemyAngle);
+        ins.Add(enemyDist);
     }
 }

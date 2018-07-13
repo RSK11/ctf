@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public class NeuralNet {
 
@@ -31,11 +32,11 @@ public class NeuralNet {
                 layers.Add(new SigmoidLayer(neuronCount, neuronCount));
             }
             //Output
-            layers.Add(new TanHLayer(neuronCount, outs));
+            layers.Add(new SigmoidLayer(neuronCount, outs));
         }
         else
         {
-            layers.Add(new TanHLayer(inputCount, outs));
+            layers.Add(new SigmoidLayer(inputCount, outs));
         }
     }
 
@@ -45,7 +46,7 @@ public class NeuralNet {
 
         for (int i = 1; i < hiddenCount + 1; i++)
         {
-            layers[i].Calculate(layers[i - 1].outputs);
+            layers[i].Calculate(new List<double>(layers[i - 1].outputs));
         }
 
         return layers[hiddenCount].outputs;
@@ -70,10 +71,10 @@ public class NeuralNet {
     private List<double> ErrorSums(int layer)
     {
         List<double> sums = new List<double>();
-        double sum = 0f;
+        double sum = 0;
         for (int neu = 0; neu < layers[layer].neuronCount; neu++)
         {
-            sum = 0f;
+            sum = 0;
             for (int i = 0; i < layers[layer + 1].neuronCount; i++)
             {
                 sum += layers[layer + 1].neurons[i].errorGrad * layers[layer + 1].neurons[i].weights[neu];
@@ -81,6 +82,16 @@ public class NeuralNet {
             sums.Add(sum);
         }
         return sums;
+    }
+
+    public void Write(string file)
+    {
+        StreamWriter writer = new StreamWriter(file, true);
+        foreach (Layer lay in layers)
+        {
+            lay.Write(writer);
+        }
+        writer.Close();
     }
 
     public class TanHLayer : Layer
@@ -110,6 +121,29 @@ public class NeuralNet {
         public override double Derivative(int ind)
         {
             return outputs[ind] * (1.0 - outputs[ind]);
+        }
+    }
+
+    public class LeakyRELULayer : Layer
+    {
+        public LeakyRELULayer(int ins, int count) : base(ins, count) { }
+
+        public override double Activation(double res)
+        {
+            if (res < 0)
+            {
+                return .01 * res;
+            }
+            return res;
+        }
+
+        public override double Derivative(int ind)
+        {
+            if (outputs[ind] < 0)
+            {
+                return .01;
+            }
+            return 1;
         }
     }
 }

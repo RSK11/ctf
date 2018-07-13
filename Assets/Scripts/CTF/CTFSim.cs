@@ -82,8 +82,13 @@ public class CTFSim : MonoBehaviour {
             players.Add(newPlayer);
             i++;
         }
+        else
+        {
+            Camera.main.gameObject.AddComponent<FrstCam>();
+            Camera.main.transform.position = goals[0].transform.position + Vector3.up * 20f;
+        }
 
-        for (i = 0; i < PlayersPerTeam; i++)
+        for (; i < PlayersPerTeam; i++)
         {
             float ang = Mathf.PI * 2 * (float)i / (float)PlayersPerTeam;
             Vector3 offset = new Vector3(Mathf.Cos(ang), 0f, Mathf.Sin(ang)) * spawnRadius;
@@ -150,7 +155,8 @@ public class CTFSim : MonoBehaviour {
         rs = null;
         if (hum)
         {
-            nnbrain = players[0].GetComponent<Human>().GenSets();
+            nnbrain = players[0].GetComponent<Human>().GenSets(10000);
+            nnbrain.Write("Assets/trainedbrain.txt");
         }
         scores.Clear();
         players.Clear();

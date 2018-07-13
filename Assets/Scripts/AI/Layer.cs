@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public abstract class Layer {
     public int neuronCount;
@@ -31,6 +32,7 @@ public abstract class Layer {
             {
                 outp += neurons[neu].weights[ind] * ins[ind];
             }
+            
             outputs.Add(Activation(outp + neurons[neu].bias));
         }
     }
@@ -63,4 +65,13 @@ public abstract class Layer {
 
     public abstract double Activation(double res);
     public abstract double Derivative(int ind);
+
+    public void Write(StreamWriter sw)
+    {
+        foreach(Neuron neu in neurons)
+        {
+            neu.Write(sw);
+        }
+        sw.WriteLine();
+    }
 }

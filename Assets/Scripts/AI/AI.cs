@@ -26,7 +26,7 @@ public class AI : CTFPlayer
         SetTeam(team);
         sim = ctf;
         meshBody.material = mat;
-        brain = new NeuralNet(8, 5, 4, 4, .7);
+        brain = new NeuralNet(8, 3, 3, 3, .7);
         goalCheck = sim.goals[(team + 1) % 2].transform.position;
     }
 
@@ -56,11 +56,11 @@ public class AI : CTFPlayer
         else
         {
             Look();
-            if (directions[3] > .5f)
+            if (directions[1] > .5f)
             {
                 JumpTry();
             }
-            if (directions[4] > .5f)
+            if (directions[2] > .5f)
             {
                 weap.Attack();
             }
@@ -72,23 +72,23 @@ public class AI : CTFPlayer
     public virtual void Look()
     {
         List<double> ins = new List<double>();
-        double enemyDir = 0;
-        double enemyDist = sightRadius;
+        double enemyAngle = 0;
+        double enemyDist = 2;
         double enemyHasFlag = 0;
         double haveFlag = 0;
+        Vector3 ray = new Vector3();
         Collider[] hits = Physics.OverlapSphere(transform.position, sightRadius);
         foreach (Collider hit in hits)
         {
-            Vector3 ray = hit.transform.position - transform.position;
+            ray = hit.transform.position - transform.position;
             if (Vector3.Angle(body.transform.forward, ray) < sightAngle)
             {
                 if (hit.CompareTag("Contestant"))
                 {
                     CTFPlayer player = hit.gameObject.GetComponent<CTFPlayer>();
-                    if (player.team != team && ((ray.magnitude < enemyDist && enemyHasFlag == 0) || player.flag))
+                    if (player.team != team && ((ray.magnitude / sightRadius < enemyDist && enemyHasFlag == 0) || player.flag))
                     {
-                        enemyDir = Vector3.SignedAngle(body.transform.forward, ray, Vector3.up) / 180f;
-                        enemyDist = ray.magnitude;
+                        AngDist(hit.transform.position, out enemyAngle, out enemyDist);
                         if (player.flag)
                         {
                             enemyHasFlag = 1;
@@ -110,16 +110,25 @@ public class AI : CTFPlayer
             haveFlag = 1;
         }
 
-        ins.Add(enemyDir);
+        ins.Add(enemyAngle);
         ins.Add(enemyDist);
         ins.Add(enemyHasFlag);
-        ins.Add(Vector3.SignedAngle(body.transform.forward, goalCheck - transform.position, Vector3.up) / 180f);
-        ins.Add((goalCheck - transform.position).magnitude);
+        AngDist(goalCheck, out enemyAngle, out enemyDist);
+        ins.Add(enemyAngle);
+        ins.Add(enemyDist);
         ins.Add(haveFlag);
-        ins.Add(Vector3.SignedAngle(body.transform.forward, sim.goals[team].transform.position - transform.position, Vector3.up) / 180f);
-        ins.Add((sim.goals[team].transform.position - transform.position).magnitude);
+        AngDist(sim.goals[team].transform.position, out enemyAngle, out enemyDist);
+        ins.Add(enemyAngle);
+        ins.Add(enemyDist);
 
         directions = brain.Run(ins);
+    }
+
+    protected void AngDist(Vector3 pos, out double ang, out double dist)
+    {
+        Vector3 ray = pos - transform.position;
+        ang = (Vector3.SignedAngle(body.transform.forward, ray, Vector3.up) + 180f) / 360f;
+        dist = ray.magnitude / (10 * sightRadius);
     }
 
     // Handle the player's death
@@ -186,17 +195,13 @@ public class AI : CTFPlayer
     }
 
     // Returns the direction of the current goal
-    public virtual Vector3 GetDirection()
+    public Vector3 GetDirection()
     {
-        Vector3 dir = body.transform.forward * (float)directions[1] + body.transform.right * (float)directions[0];
+        Vector3 dir = body.transform.forward * Mathf.Cos(2 * Mathf.PI * (float)directions[0] - Mathf.PI) + body.transform.right * Mathf.Sin(2 * Mathf.PI * (float)directions[0] - Mathf.PI);
 
         // Ignore height and small movements
         dir.y = 0f;
-        dir = dir.normalized * Mathf.Abs((float)directions[2]);
-        if (dir.magnitude < .5f)
-        {
-            dir = new Vector3();
-        }
+        dir.Normalize();
 
         return dir;
     }

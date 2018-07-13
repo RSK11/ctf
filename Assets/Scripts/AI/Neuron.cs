@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public class Neuron {
     public double errorGrad = 0f;
@@ -14,5 +15,14 @@ public class Neuron {
         {
             weights.Add(Random.Range(-1f, 1f));
         }
+    }
+
+    public void Write(StreamWriter sw)
+    {
+        foreach (double weight in weights)
+        {
+            sw.Write(weight + ",");
+        }
+        sw.WriteLine(bias + "," + errorGrad);
     }
 }
