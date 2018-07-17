@@ -157,7 +157,6 @@ public class CTFSim : MonoBehaviour {
         if (hum)
         {
             nnbrain = players[0].GetComponent<Human>().GenSets(10000);
-            nnbrain.Write("Assets/trainedbrain.txt");
         }
         scores.Clear();
         players.Clear();

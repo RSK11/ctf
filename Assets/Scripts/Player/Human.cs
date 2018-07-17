@@ -60,31 +60,15 @@ public class Human : AI {
                 i--;
             }
         }
-        string path = "Assets/test.txt";
 
-        //Write some text to the test.txt file
-        StreamWriter writer = new StreamWriter(path, true);
         for (int k = 0; k < times; k++)
         {
             for (int l = 0; l < inList.Count; l++)
             {
                 brain.Train(inList[l], expList[l]);
-                if (k == 0)
-                {
-                    foreach (double dub in inList[l])
-                    {
-                        writer.Write(dub + ",");
-                    }
-                    writer.WriteLine("");
-                    foreach (double dubss in expList[l])
-                    {
-                        writer.Write(dubss + ",");
-                    }
-                    writer.WriteLine("");
-                }
             }
-            }
-        writer.Close();
+        }
+
         return brain;
     }
 
