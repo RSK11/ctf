@@ -6,6 +6,7 @@ public class Map : MonoBehaviour {
     public CTFSim sim;
     public List<GoalScript> goals;
     public ResultScript rs;
+    public HealthScript hs;
 
     // Use this for initialization
     void Start () {

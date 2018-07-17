@@ -9,7 +9,7 @@ public class Human : AI {
     public List<double> ins = new List<double>();
     private List<List<double>> inList = new List<List<double>>();
     private List<List<double>> expList = new List<List<double>>();
-    int count = 5;
+    int count = 3;
     float timer = 0f;
 
     // Use this for initialization
@@ -20,7 +20,7 @@ public class Human : AI {
         SetTeam(team);
         sim = ctf;
         meshBody.material = mat;
-        brain = new NeuralNet(8, 3, 1, 3, .4);
+        brain = new NeuralNet(8, 3, 1, 3, .3);
         goalCheck = sim.goals[(team + 1) % 2].transform.position;
     }
 
@@ -121,7 +121,7 @@ public class Human : AI {
             dirs.Add(0);
         }
         directions = dirs;
-        timer += Time.deltaTime * 2;
+        timer += Time.deltaTime * 4;
         if (timer > count)
         {
             inList.Add(ins);

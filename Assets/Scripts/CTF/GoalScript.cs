@@ -9,10 +9,17 @@ public class GoalScript : CTFObject {
 	void OnTriggerEnter(Collider coll)
     {
         FlagScript flag = coll.GetComponent<FlagScript>();
-        if (flag != null && flag.team != team)
+        if (flag != null)
         {
             // Increment the team's score
-            flag.Score(team);
+            if (flag.team != team)
+            {
+                flag.Score(team);
+            }
+            else if (flag.par != null)
+            {
+                flag.par.DropFlag(transform.position);
+            }
         }
     }
 

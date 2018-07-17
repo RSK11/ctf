@@ -18,18 +18,20 @@ public class HealthScript : MonoBehaviour
         float wid = Mathf.Min(Mathf.Max(0, Screen.width - 540) / 740, 1);
         tex.fontSize = 20 + Mathf.RoundToInt(30 * wid);
         GetComponent<RectTransform>().sizeDelta = new Vector2(130 + 150 * wid, 30 + 60 * wid);
+        tex.text = "";
     }
 
     void Update()
     {
-        // Display the health
         if (player != null)
         {
+            // Display the health
             tex.text = "Health: " + player.health;
         }
-        else
-        {
-            tex.text = "Health: 0";
-        }
+    }
+
+    public void SetPlayer(CTFPlayer target)
+    {
+        player = target;
     }
 }

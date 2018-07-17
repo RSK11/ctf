@@ -1306,6 +1306,7 @@ MonoBehaviour:
   - {fileID: 1888994158}
   - {fileID: 1660087091}
   rs: {fileID: 522606208}
+  hs: {fileID: 105872725}
 --- !u!65 &1076960132
 BoxCollider:
   m_ObjectHideFlags: 0

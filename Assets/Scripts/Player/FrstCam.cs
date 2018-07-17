@@ -20,11 +20,7 @@ public class FrstCam : MonoBehaviour {
         move += Vector3.up * Input.GetAxis("QE");
         transform.position += move.normalized * Speed * Time.deltaTime;
 
-        Vector3 angles = transform.rotation.eulerAngles;
-        angles.z = 0f;
-        Vector3 desired = angles + new Vector3 (Input.GetAxis("Mouse Y") * -RotateSpeed , Input.GetAxis("Mouse X") * RotateSpeed);
-        desired.z = 0f;
-        transform.rotation = Quaternion.SlerpUnclamped(transform.rotation, Quaternion.Euler(desired), Time.deltaTime);
+        transform.rotation = Quaternion.SlerpUnclamped(transform.rotation, Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"))), Time.deltaTime * RotateSpeed);
     }
 
     // Update is called once per frame

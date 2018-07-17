@@ -22,7 +22,7 @@ public class FlagScript : CTFObject {
     // The timer for rising from the ground
     float timer = 0f;
     // The player carrying the flag
-    private CTFPlayer par;
+    public CTFPlayer par;
 
 	void Start () {
         home = transform.position;

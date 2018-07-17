@@ -80,6 +80,7 @@ public class CTFSim : MonoBehaviour {
             tcam.transform.SetParent(newPlayer.transform);
             newPlayer.SetCam(tcam);
             players.Add(newPlayer);
+            map.hs.SetPlayer(players[0]);
             i++;
         }
         else
